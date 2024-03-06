@@ -19,34 +19,49 @@ namespace BookPracEFcore
         {
             // categoryName에 따라 로거를 더 구현할 수 있다.
             // 여기서는 ConsoleLogger 하나만 구현한다. 
-            throw new NotImplementedException();
+            return new ConsoleLogger();
         }
 
         /// <summary>
         /// logger가 관리하지 않는 리소스를 사용하면 여기서 메모리를 해지한다.
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
+        public void Dispose(){}
     }
 
     public class ConsoleLogger : ILogger
     {
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull
-        {
-            throw new NotImplementedException();
-        }
+        { return null; }
 
         public bool IsEnabled(LogLevel logLevel)
-        {
-            throw new NotImplementedException();
+        { 
+            switch(logLevel)
+            {
+                case LogLevel.Debug:
+                case LogLevel.Warning:
+                case LogLevel.Information:
+                case LogLevel.Error:
+                case LogLevel.None: return false;
+                default:
+                    return true;
+            }
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
         {
-            throw new NotImplementedException();
+            Console.Write($"level : {logLevel}, Event_id : {eventId.Id}");
+
+            if(state != null)
+            {
+                Console.Write($", state : {state}");
+            }
+            if(exception != null)
+            {
+                Console.Write($", Exception : {exception.Message}");
+            }
+
+            Console.WriteLine();
         }
     }
 }

@@ -1,6 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using static System.Console;
 
+// 로깅에 필요한 네임스페이스
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
 namespace BookPracEFcore
 {
     internal class Program
@@ -53,36 +58,58 @@ namespace BookPracEFcore
         {
             using(Northwind context = new Northwind())
             {
+                //// 사용자 지정 콘솔 로거 추가
+                //ILoggerFactory loggerFactory =context.GetService<ILoggerFactory>();
+                //loggerFactory.AddProvider(new ConsoleLoggerProvider());
+
+
                 WriteLine($"Products that cost more than a price, highest at top");
 
                 string? input = null;
-                decimal price = 0M;
+               // decimal price = 0M;
+                string? words = null;
 
-                do {
-                    Write("Enter a product Price: ");
-                    input = ReadLine();
-                }while(!decimal.TryParse(input, out price));
+                //do {
+                //    Write("Enter a product Price: ");
+                //    input = ReadLine();
+                //}while(!decimal.TryParse(input, out price));
 
-                IQueryable<Product> products = context.Products.Where(product => product.Cost > price)
-                                        .OrderByDescending(product => product.Cost)
-                                        .Select(x => new Product()
-                                        {
-                                            CategoryId = x.ProductId,
-                                            ProductName = x.ProductName,
-                                            Cost = x.Cost,
-                                            ProductId = x.ProductId,    
-                                        });
+                Write("Enter words : ");
+                words = ReadLine();
 
-                // 생성된 쿼리문 확인
-                WriteLine($"SQL 쿼리문 :{products.ToQueryString()}\n\n");
+                //IQueryable<Product> products = context.Products.Where(product => product.Cost > price)
+                //                        .OrderByDescending(product => product.Cost)
+                //                        .Select(x => new Product()
+                //                        {
+                //                            CategoryId = x.ProductId,
+                //                            ProductName = x.ProductName,
+                //                            Cost = x.Cost,
+                //                            ProductId = x.ProductId,    
+                //                        });
 
 
+                var testLikeResults = context.Products
+                    .Where(product => EF.Functions
+                            .Like(product.ProductName, $"{words}%"))
+                    .OrderBy(product => product.ProductId)
+                    .Select(product => new {
+                        ProductId = product.ProductId,
+                        ProductName = product.ProductName,
+                        cost = product.Cost
+                    });
 
-                foreach(var element in products)
+                WriteLine("이름이 포함된 제품 정보\n");
+                foreach(var element in testLikeResults)
                 {
-                    WriteLine($"{element.ProductName} , {element.Cost}");
+                    WriteLine(
+                        $"\n------------\n제품 아이디 {element.ProductId}\n" +
+                        $"제품 이름 {element.ProductName}\t" +
+                        $"가격 {element.cost}");
                 }
 
+
+                // 생성된 쿼리문 확인
+                WriteLine($"SQL 쿼리문 :{testLikeResults.ToQueryString()}\n\n");
             }
         }
     }
