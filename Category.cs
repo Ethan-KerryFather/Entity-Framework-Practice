@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace BookPracEFcore
 {
-    internal class Category
+    public class Category
     {
         [Key]
         public int CategoryId {  get; set; }

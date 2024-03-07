@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BookPracEFcore
 {
-    internal class Product
+    public class Product
     {
         [Key]
         public int ProductId { get; set; } // 기본키

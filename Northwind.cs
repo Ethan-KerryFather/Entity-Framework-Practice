@@ -15,8 +15,16 @@ namespace BookPracEFcore
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             // base.OnConfiguring(optionsBuilder);
-            string connection = "Server=D662-ETHANLIM;Database=Northwind;Trusted_Connection=True;TrustServerCertificate=True";
+            string connection = "Server=D662-ETHANLIM;Database=Northwind;Trusted_Connection=True;TrustServerCertificate=True;";
             optionsBuilder.UseSqlServer(connection);
+
+            // 지연로딩 프록시 사용 설정
+            //optionsBuilder.UseLazyLoadingProxies();
+
+           
+            
+            // 로그 작성
+            //optionsBuilder.LogTo(Console.WriteLine);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +34,11 @@ namespace BookPracEFcore
                 .Property(category => category.CategoryName)
                 .IsRequired()
                 .HasMaxLength(15);
+
+
+            // 전역 필터 추가
+            modelBuilder.Entity<Product>()
+                .HasQueryFilter(product => product.Discontinued != true);
                 
         }
     }
